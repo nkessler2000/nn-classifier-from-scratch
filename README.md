@@ -25,7 +25,7 @@ __Note:__ Data must be stored as numeric numpy arrays.
 Outputs a numpy array containing predicted labels.
 
 #### Other files in repo: 
-- `MyNeuralClassifier - MNIST data.ipynb' - Jupyter notebook for testing classifer with MNIST dataset
+- `MyNeuralClassifier` - MNIST data.ipynb' - Jupyter notebook for testing classifer with MNIST dataset
 - `ds_functions.py` - Additional functions
 - `__main__.py` - same code as Jupyter notebook
 - `requirements.txt` - Install required modules using `pip install -r requirements.txt`
