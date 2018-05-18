@@ -3,30 +3,30 @@
 This code contains an implementation of a neural network classifier built from scratch. 
 
 ### Usage
-1. Import class `MyNeuralClassifier` from `MyNeuralClassifier.py`
+#### Import class `MyNeuralClassifier` from `MyNeuralClassifier.py`
 
 `from MyNeuralClassifier import MyNeuralClassifier`
 
-2. Instantiate the class
-`my_nn = MyNeuralClassifier()
-####Options
--`l_sizes`- A tuple containing hidden layer sizes. Default: (100,)
--`am`- Lambda regularization term. Default: 0
--`maxiter`- Maximum number of iterations for the optimizer. Default: 100
--`tol` - Tolerance threshold for optimizer. Default: 1e-5
--`solver` - Solver method for optimizer. Default: L-BFGS-B
+#### Instantiate the class
+`my_nn = MyNeuralClassifier()`<Br>
+__Options__<Br>
+- `hl_sizes` - A tuple containing hidden layer sizes. _Default: (100,)_
+- `lam`- Lambda regularization term. _Default: 0_
+- `maxiter`- Maximum number of iterations for the optimizer. _Default: 100_
+- `tol` - Tolerance threshold for optimizer. _Default: 1e-5_
+- `solver` - Solver method for optimizer. _Default: L-BFGS-B_
 
-3. Fit the data
-`my_nn.fit(X,y)`
+#### Fit the data
+`my_nn.fit(X,y)`<br>
 __Note:__ Data must be stored as numeric numpy arrays.
 
-4. Generate predictions
-`my_nn.predict(X)` 
+#### Generate predictions
+`my_nn.predict(X)` <br>
 Outputs a numpy array containing predicted labels.
 
-Other files in repo: 
-`MyNeuralClassifier - MNIST data.ipynb' - Jupyter notebook for testing classifer with MNIST dataset
-`ds_functions.py` - Additional functions
-`__main__.py` - same code as Jupyter notebook
-`requirements.txt` - Install required modules using `pip install -r requirements.txt`
-`my_nn.pkl.bz2` - Pickled trained model
+#### Other files in repo: 
+- `MyNeuralClassifier - MNIST data.ipynb' - Jupyter notebook for testing classifer with MNIST dataset
+- `ds_functions.py` - Additional functions
+- `__main__.py` - same code as Jupyter notebook
+- `requirements.txt` - Install required modules using `pip install -r requirements.txt`
+- `my_nn.pkl.bz2` - Pickled trained model
