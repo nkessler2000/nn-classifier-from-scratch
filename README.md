@@ -25,8 +25,11 @@ __Note:__ Data must be stored as numeric numpy arrays.
 Outputs a numpy array containing predicted labels.
 
 #### Other files in repo: 
-- `MyNeuralClassifier` - MNIST data.ipynb' - Jupyter notebook for testing classifer with MNIST dataset
+- `MyNeuralClassifier - MNIST data.ipynb` - Jupyter notebook for testing classifer with MNIST dataset
 - `ds_functions.py` - Additional functions
 - `__main__.py` - same code as Jupyter notebook
 - `requirements.txt` - Install required modules using `pip install -r requirements.txt`
 - `my_nn.pkl.bz2` - Pickled trained model
+- `MyNeuralClassifier.sln` - Visual Studio Solution file
+- `MyNeuralClassifier.pyproj` - Visual Studio Project file
+- `README.md` - This file
