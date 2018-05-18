@@ -14,7 +14,7 @@ class MyNeuralClassifier():
     def __init_thetas(self, hl_sizes, n_features, n_classes):
         """Build list of initiali weight vectors"""
         
-        def get_weight(self, layer_in, layer_out, epsilon=0.1):
+        def get_weight(layer_in, layer_out, epsilon=0.1):
             """Create a random weight vector Theta of the specified size"""
             weight = np.random.rand(layer_out, layer_in + 1) 
             weight = weight * 2 * epsilon - epsilon
@@ -22,7 +22,7 @@ class MyNeuralClassifier():
 
         Thetas = []
         # add Theta for input layer
-        Thetas.append(self.get_weight(n_features, hl_sizes[0]))
+        Thetas.append(get_weight(n_features, hl_sizes[0]))
         # add additional Thetas
         for i in range(1, len(hl_sizes) + 1):
             # in is the number of units in the hidden layer
@@ -30,7 +30,7 @@ class MyNeuralClassifier():
             # out is either the number of units in the next hidden layer, or
             # the number of classes, if this is the last hidden layer
             l_out = n_classes if i == len(hl_sizes) else hl_sizes[i]
-            Thetas.append(self.get_weight(l_in, l_out))
+            Thetas.append(get_weight(l_in, l_out))
         
         return Thetas
         

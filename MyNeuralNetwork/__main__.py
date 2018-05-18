@@ -4,9 +4,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from time import time
 
-hl_sizes = (200,25)
+hl_sizes = (200,)
 lam = 3
-maxiter = 1000
+maxiter = 600
 tol = 1e-6
 solver = 'CG' # ‘L-BFGS-B’ 'BFGS'
 
