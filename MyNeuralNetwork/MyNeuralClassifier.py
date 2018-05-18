@@ -1,6 +1,5 @@
-from sklearn import datasets
-from scipy.optimize import minimize
 import numpy as np
+from scipy.optimize import minimize
 
 class MyNeuralClassifier():
     def __init__(self, hidden_layer_sizes=(100,0), lam=0, maxiter=100, tol=1e-5, solver='L-BFGS-B'):
@@ -99,7 +98,7 @@ class MyNeuralClassifier():
             for i in range(1, len(Thetas)):
                 sig_prime = self.__sigmoid_prime(z_vals[-(i+1)])
                 t = Thetas[-i][:, 1:] # drop bias unit column
-                d = np.dot(deltas[i-1], t) 
+                d = np.dot(deltas[i-1], t)
                 d = d * sig_prime
                 deltas.append(d)
             
@@ -183,6 +182,9 @@ class MyNeuralClassifier():
     
     def fit(self, X, y):
         # build initial theta values
+        if len(X) != len(y):
+            raise Exception('Length of X and y don\'t match: {0}, {1}'.format(
+                len(X), len(y)))
         Thetas_init = self.__init_thetas(self.__hl_sizes, len(X[0]), len(np.unique(y)))
         Thetas_flat = self.__flatten_arrays(Thetas_init)
         self.__n_features = len(X[0])
@@ -199,22 +201,24 @@ class MyNeuralClassifier():
                                 'gtol':self.__tol}
                        )
 
-        self.__opt_thetas = self.__unroll_thetas(res.x, self.__hl_sizes, self.__n_classes, self.__n_features)
+        self.optimal_thetas = self.__unroll_thetas(res.x, self.__hl_sizes, self.__n_classes, self.__n_features)
         return self
     
     def predict(self, X):
+        """Returns predicted labels"""
         proba = self.predict_proba(X)
         pred_ix = proba.argmax(axis=1)
         pred = np.array([self.__labels[i] for i in pred_ix])
         return pred
 
     def predict_proba(self, X):
-        if self.__opt_thetas == None:
+        """Returns probability matrix"""
+        if self.optimal_thetas == None:
             raise Exception('Fit model before predicting')
         if len(X[0]) != self.__n_features:
             raise Exception('Number of features in input does not match model: {0}, {1}'.format(len(X[0]), self.__n_features))
         m = len(X)
-        for t in self.__opt_thetas:
+        for t in self.optimal_thetas:
             X = np.append(np.ones((m, 1)), X, axis=1);
             t = np.transpose(t)
             X = self.__sigmoid(np.dot(X, t))
