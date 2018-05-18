@@ -1,4 +1,4 @@
-from ds_functions import *
+from MyNeuralClassifier import *
 from sklearn.datasets import fetch_mldata
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
@@ -8,7 +8,7 @@ hl_sizes = (200,25)
 lam = 3
 maxiter = 1000
 tol = 1e-6
-solver = 'L-BFGS-B' # ‘L-BFGS-B’ 'BFGS'
+solver = 'CG' # ‘L-BFGS-B’ 'BFGS'
 
 mnist = fetch_mldata('MNIST original')
 X = mnist.data

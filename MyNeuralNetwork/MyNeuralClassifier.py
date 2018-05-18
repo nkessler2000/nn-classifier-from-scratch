@@ -1,11 +1,9 @@
 from sklearn import datasets
 from scipy.optimize import minimize
-import seaborn as sns
 import numpy as np
-import pandas as pd
 
 class MyNeuralClassifier():
-    def __init__(self, hidden_layer_sizes=(100,0), lam=0, maxiter=100, tol=1e-5, solver='CG'):
+    def __init__(self, hidden_layer_sizes=(100,0), lam=0, maxiter=100, tol=1e-5, solver='L-BFGS-B'):
         self.__maxiter = maxiter
         self.__hl_sizes = hidden_layer_sizes
         self.__lam = lam
@@ -13,16 +11,18 @@ class MyNeuralClassifier():
         self.__opt_thetas = None
         self.__tol = tol
 
-    def __get_init_weight(self, layer_in, layer_out, epsilon=0.1):
-        """Create a random weight vector Theta of the specified size"""
-        weights = np.random.rand(layer_out, layer_in + 1) 
-        weights = weights * 2 * epsilon - epsilon
-        return weights
-    
     def __init_thetas(self, hl_sizes, n_features, n_classes):
         """Build list of initiali weight vectors"""
+        
+        def get_weight(self, layer_in, layer_out, epsilon=0.1):
+            """Create a random weight vector Theta of the specified size"""
+            weight = np.random.rand(layer_out, layer_in + 1) 
+            weight = weight * 2 * epsilon - epsilon
+            return weight
+
         Thetas = []
-        Thetas.append(self.__get_init_weight(n_features, hl_sizes[0]))
+        # add Theta for input layer
+        Thetas.append(self.get_weight(n_features, hl_sizes[0]))
         # add additional Thetas
         for i in range(1, len(hl_sizes) + 1):
             # in is the number of units in the hidden layer
@@ -30,11 +30,11 @@ class MyNeuralClassifier():
             # out is either the number of units in the next hidden layer, or
             # the number of classes, if this is the last hidden layer
             l_out = n_classes if i == len(hl_sizes) else hl_sizes[i]
-            Thetas.append(self.__get_init_weight(l_in, l_out))
+            Thetas.append(self.get_weight(l_in, l_out))
         
         return Thetas
         
-    def __unroll_thetas(self, Thetas_rolled, hl_sizes, n_classes, n_features):
+    def __unroll_thetas(self, Thetas_flat, hl_sizes, n_classes, n_features):
         """Unrolls flattened Thetas vector and returns list of Theta matrices.
         Parameters are used to determine matrix shapes"""
         n_thetas = len(hl_sizes) + 1 # for 1 hiden layer, 2 Thetas
@@ -44,7 +44,7 @@ class MyNeuralClassifier():
             rows = hl_sizes[i] if (i+1) < n_thetas else n_classes
             cols = n_features + 1 if i == 0 else hl_sizes[i-1] + 1
             end_pos = start_pos + (rows * cols)
-            values = Thetas_rolled[start_pos:end_pos] 
+            values = Thetas_flat[start_pos:end_pos] 
             ret.append(np.reshape(values, (rows, cols)))
             start_pos = end_pos
         return ret
@@ -52,7 +52,7 @@ class MyNeuralClassifier():
     def __flatten_arrays(self, arr_list):
         """Takes a list of arrays, flattens and concatenates all
         and returns a single vector"""
-        ret = [a.reshape(-1) for a in arr_list]
+        ret = [a.flatten('C') for a in arr_list] # 'C' to flatten row-wise
         ret = np.concatenate(ret, axis=0)
         return ret
         
@@ -148,19 +148,17 @@ class MyNeuralClassifier():
                 D = Deltas[i]
                 t[:,0] = 0 # set bias unit column values to zero
                 grad = (D/m) + ((lam/m) * t)
-                grads.append(grad.flatten('C')) # row-wise (C style)
-            ret = np.concatenate(grads, axis=0)
+                grads.append(grad)
+            ret = self.__flatten_arrays(grads)
             return ret
     
         # get y as a matrix
         y_mat = self.__get_y_matrix(y)
         # number of observations
         m = len(X[:,])    
-        
-        n_classes = len(np.unique(y))
-        n_features = len(X[1])
+       
         # unroll thetas 
-        Thetas = self.__unroll_thetas(Thetas_rolled, hl_sizes, n_classes, n_features)
+        Thetas = self.__unroll_thetas(Thetas_rolled, hl_sizes, self.__n_classes, self.__n_features)
         
         # build activation unit values
         a_vals, z_vals = get_activation_units(Thetas, X, y_mat, lam)
@@ -168,14 +166,16 @@ class MyNeuralClassifier():
         # now, with the activation units, we can compute cost
         reg_term = get_reg_term(Thetas, m, lam) if lam != 0 else 0
         cost = get_cost(a_vals[-1], y_mat, m) + reg_term
+
         # if return_grads is False, exit here
         if not return_grad:
             return cost
-        # also get the Delta values to compute the gradients
+
+        # get the Delta values to compute the gradients
         Deltas = get_deltas(Thetas, a_vals, z_vals, y_mat)
-        
         # now get the gradients
         grad = get_gradients(Deltas, Thetas, m)
+        # make sure dimensions match
         if len(grad) != len(Thetas_rolled):
             raise Exception('Length of input vector and gradient vector don\'t match, {0}, {1}'.format(
                 len(grad), len(Thetas_rolled)))
@@ -185,6 +185,10 @@ class MyNeuralClassifier():
         # build initial theta values
         Thetas_init = self.__init_thetas(self.__hl_sizes, len(X[0]), len(np.unique(y)))
         Thetas_flat = self.__flatten_arrays(Thetas_init)
+        self.__n_features = len(X[0])
+        self.__n_classes = len(np.unique(y)) 
+        self.__labels = np.unique(y)
+
         # get the optimal thetas
         res = minimize(fun=self.__cost_func, 
                        x0=Thetas_flat, 
@@ -194,10 +198,8 @@ class MyNeuralClassifier():
                        options={'maxiter':self.__maxiter, 
                                 'gtol':self.__tol}
                        )
-        n_classes = len(np.unique(y))
-        n_features = len(X[1])
-        self.__opt_thetas = self.__unroll_thetas(res.x, self.__hl_sizes, n_classes, n_features)
-        self.__labels = np.unique(y)
+
+        self.__opt_thetas = self.__unroll_thetas(res.x, self.__hl_sizes, self.__n_classes, self.__n_features)
         return self
     
     def predict(self, X):
@@ -209,8 +211,10 @@ class MyNeuralClassifier():
     def predict_proba(self, X):
         if self.__opt_thetas == None:
             raise Exception('Fit model before predicting')
+        if len(X[0]) != self.__n_features:
+            raise Exception('Number of features in input does not match model: {0}, {1}'.format(len(X[0]), self.__n_features))
         m = len(X)
-        for t in __opt_thetas:
+        for t in self.__opt_thetas:
             X = np.append(np.ones((m, 1)), X, axis=1);
             t = np.transpose(t)
             X = self.__sigmoid(np.dot(X, t))
