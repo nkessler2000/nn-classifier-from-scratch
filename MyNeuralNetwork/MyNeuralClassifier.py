@@ -7,8 +7,8 @@ class MyNeuralClassifier():
         self.__hl_sizes = hidden_layer_sizes
         self.__lam = lam
         self.__solver = solver
-        self.__opt_thetas = None
         self.__tol = tol
+        self.optimal_thetas = None
 
     def __init_thetas(self, hl_sizes, n_features, n_classes):
         """Build list of initiali weight vectors"""
