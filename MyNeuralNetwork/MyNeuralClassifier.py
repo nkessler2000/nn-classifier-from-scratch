@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 class MyNeuralClassifier():
-    def __init__(self, hidden_layer_sizes=(100,0), lam=0, maxiter=100, tol=1e-5, solver='L-BFGS-B'):
+    def __init__(self, hidden_layer_sizes=(100,), lam=0, maxiter=100, tol=1e-5, solver='L-BFGS-B'):
         self.__maxiter = maxiter
         self.__hl_sizes = hidden_layer_sizes
         self.__lam = lam
@@ -11,7 +11,7 @@ class MyNeuralClassifier():
         self.optimal_thetas = None
 
     def __init_thetas(self, hl_sizes, n_features, n_classes):
-        """Build list of initiali weight vectors"""
+        """Build list of initial weight vectors"""
         
         def get_weight(layer_in, layer_out, epsilon=0.1):
             """Create a random weight vector Theta of the specified size"""
