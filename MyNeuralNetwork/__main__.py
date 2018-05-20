@@ -4,9 +4,9 @@ from sklearn.datasets import fetch_mldata
 
 hl_sizes = (200,50)
 lam = 3
-maxiter = 600
-tol = 1e-6
-solver = 'L-BFGS-B'  # ‘CG’ 'BFGS' 'L-BFGS-B'
+maxiter = 500
+tol = 1e-5
+solver = 'L-BFGS-B'  # ‘CG’ 'TNC' 'L-BFGS-B'
 
 mnist = fetch_mldata('MNIST original')
 X = mnist.data

@@ -96,10 +96,10 @@ class MyNeuralClassifier():
             
             # next, add in deltas for ealier layers
             for i in range(1, len(Thetas)):
-                sig_prime = self.__sigmoid_prime(z_vals[-(i+1)])
+                a = a_vals[-(i+1)][:, 1:]
+                sig_prime =  a * (1 - a) # a = sigmoid(z), so we can substitute 
                 t = Thetas[-i][:, 1:] # drop bias unit column
-                d = np.dot(deltas[i-1], t)
-                d = d * sig_prime
+                d = np.dot(deltas[i-1], t) * sig_prime
                 deltas.append(d)
             
             # now, to get our Delta values, we can multiply the deltas by the activation unit values
@@ -191,17 +191,22 @@ class MyNeuralClassifier():
         self.__n_classes = len(np.unique(y)) 
         self.__labels = np.unique(y)
 
-        # get the optimal thetas
+        # Set method options
+        options = {'maxiter':self.__maxiter}
+        # solve for optimal thetas
         res = minimize(fun=self.__cost_func, 
                        x0=Thetas_flat, 
                        args=(X,y,self.__hl_sizes,self.__lam), 
                        jac=True, 
+                       tol=self.__tol,
                        method=self.__solver, 
-                       options={'maxiter':self.__maxiter, 
-                                'gtol':self.__tol}
+                       options=options
                        )
 
-        self.optimal_thetas = self.__unroll_thetas(res.x, self.__hl_sizes, self.__n_classes, self.__n_features)
+        self.optimal_thetas = self.__unroll_thetas(res.x, 
+                                                   self.__hl_sizes, 
+                                                   self.__n_classes, 
+                                                   self.__n_features)
         return self
     
     def predict(self, X):
